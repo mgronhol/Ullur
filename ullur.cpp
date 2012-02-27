@@ -205,6 +205,8 @@ std::string handle_geo_getr( double x0, double y0, double x1, double y1 ){
 
 std::string handle_del( uint64_t id ){
 	std::unordered_map< uint64_t, std::vector< uint64_t > >::iterator it;
+	/* Fix this, probably broken... */
+	
 	it = database.find( id );
 	if( it != database.end() ){
 		hashes.erase( it->first );

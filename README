@@ -1,0 +1,35 @@
+Ullur geospatial indexing server
+========
+
+Ullur is a server for fast geospatial lookups i.e. find me points which
+are near this point.
+
+
+ID = 64 bit unsigned interger
+
+Command set
+	PUT x y ID
+		Insert ID to coordinates (x,y)
+	
+	GEO-PUT lat lon ID
+		Insert ID to coordinates (lat,lon)
+	
+	GET x y r
+		Fetch all entries, whose distance is <= r from (x,y)
+	
+	GET-GET lat lon r
+		Fetch all entries, whose (angular) distance is <= r from (lat,lon)
+	
+	GETR x0 y0 x1 y1
+		Fetch all entries inside rectangle (x0,y0) -> (x1,y1)
+	
+	GEO-GETR lat0 lon0 lat1 lon1
+		Fetch all entries inside rectangle (lat0,lon0) -> (lat1,lon1)
+	
+
+- Fetching complexity O(log N + M), where N is the number of keys in database 
+and M is the number entries in the search result
+- Insert is O(1)
+
+
+

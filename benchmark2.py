@@ -20,14 +20,14 @@ t1 = time.time()
 
 #print "It took %.3f secs to insert %i entries into Ullur. (%.3f entries/s)"%( t1-t0, L, L/(t1-t0) )
 
-N = 100000
+N = 10000
 z = 0
 t2 = time.time()
 for i in range( N ):
 	x = random.random()
 	y = random.random()
-	print i, z, x, y
-	data = client.get( x, y, 0.03 )
+	#print i, z, x, y
+	data = client.get( x, y, 0.003 )
 	z += len( data )
 	
 t3 = time.time()

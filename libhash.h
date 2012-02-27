@@ -4,6 +4,7 @@
 #include <iostream>
 #include <set>
 #include <map>
+#include <unordered_map>
 #include <stdint.h>
 #include <cmath>
 #include <vector>
@@ -17,7 +18,7 @@ std::vector< std::pair<uint64_t, uint64_t> > get_near_indices( uint64_t level, u
 double get_squared_distance( std::pair<double, double> &A, std::pair<double, double> &B );
 
 std::vector< uint64_t > extract_points( std::set<uint64_t> & points, std::vector< std::pair<uint64_t, uint64_t> > &areas );
-std::vector<uint64_t> filter_points( std::vector< uint64_t > &keys, std::map<uint64_t, uint64_t> &values, std::pair<double, double> point, double radius );
+std::vector<uint64_t> filter_points( std::vector< uint64_t > &keys, std::unordered_map<uint64_t, uint64_t> &values, std::pair<double, double> point, double radius );
 
 #endif
 

@@ -136,7 +136,7 @@ std::vector< uint64_t > extract_points( std::set<uint64_t> & points, std::vector
 	}
 
 
-std::vector<uint64_t> filter_points( std::vector< uint64_t > &keys, std::map<uint64_t, uint64_t> &values, std::pair<double, double> point, double radius ){
+std::vector<uint64_t> filter_points( std::vector< uint64_t > &keys, std::unordered_map<uint64_t, uint64_t> &values, std::pair<double, double> point, double radius ){
 	std::vector<uint64_t> out;
 	std::pair<double, double> pos;
 	

@@ -9,5 +9,9 @@ libhash:
 Ullur: libhash
 	$(CC) $(FLAGS) ullur.cpp -o ullur libhash.o
 
+benchmark: libhash
+	$(CC) $(FLAGS) benchmark.cpp -o benchmark libhash.o
+
 clean:
 	rm *.o ullur
+	rm benchmark

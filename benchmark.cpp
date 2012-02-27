@@ -1,6 +1,7 @@
 #include <iostream>
 #include <map>
 #include <set>
+#include <unordered_map>
 
 #include <time.h>
 #include <sys/time.h>
@@ -29,10 +30,14 @@ int main( int argc, char **argv ){
 	
 	std::set< uint64_t > hashes;
 	std::vector<uint64_t> res_euc, res_hash;
-	std::map< uint64_t, uint64_t > db, db_euc;
+	std::unordered_map< uint64_t, uint64_t > db, db_euc;
 	
 	std::pair<double, double> test_point = std::make_pair( 0.5, 0.5 );
 	uint64_t test_point_h = compute_hash( test_point.first, test_point.second );
+	
+	if( argc < 2 ){
+		std::cerr << "Usage: " << argv[0] << " N" << std::endl;
+		}
 	
 	int N = atoi( argv[1] );//15;
 	double radius = 1.0/(1<<N);

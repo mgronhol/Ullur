@@ -30,18 +30,18 @@
 std::map<int, std::string> connection_buffers;
 
 std::set< uint64_t > hashes;
-std::multimap< uint64_t, uint64_t > database;
+std::unordered_map< uint64_t, std::vector< uint64_t > > database;
 
 FILE *append_log = NULL;
 
-std::vector< uint64_t > multiget( std::multimap< uint64_t, uint64_t > &db, uint64_t key ){
+std::vector< uint64_t > multiget( std::unordered_map< uint64_t, std::vector< uint64_t > > &db, uint64_t key ){
 	std::vector< uint64_t > out;
-	std::multimap< uint64_t, uint64_t >::iterator it;
+	std::unordered_map< uint64_t, std::vector< uint64_t > >::iterator it;
 	
 	it = db.find( key );
 	if( it != db.end() ){
-		for( ; it->first == key ; it++ ){
-			out.push_back( it->second );
+		for( size_t i = 0 ; i < (it->second).size() ; ++i ){
+			out.push_back( (it->second)[i] );
 			}
 		}
 	
@@ -74,10 +74,14 @@ std::string handle_put( double x, double y, uint64_t id ){
 	uint64_t H;
 	H = compute_hash( x, y );
 	hashes.insert( H );
-	database.insert( std::pair< uint64_t, uint64_t >( H, id ) );
-	//std::cerr << "handle_put: id = " << id << std::endl;
-	//printf( "handle_put: H = %lu id = %lu\n", H, id );
-	//fprintf( append_log, "PUT %f %f %lu\r\n", x, y, id );
+	//database.insert( std::pair< uint64_t, uint64_t >( H, id ) );
+	if( database.find( H ) != database.end() ){
+		database[H].push_back( id );
+		}
+	else{
+		database[H] = std::vector< uint64_t >();
+		database[H].push_back( id );
+		}
 	out = "Ok.\r\n";
 
 	return out;
@@ -113,23 +117,23 @@ std::string handle_get( double x, double y, double r ){
 
 	double radius = r*r;
 	std::pair< double, double > point;
-	//printf( "\n" );
+
 	for( size_t i = 0 ; i < results_inter.size() ; ++i ){
 		point = compute_position( results_inter[i] );
-		//printf( "handle_get:[%i] %lu ", i, results_inter[i] );
+
 		if( get_squared_distance( point, test_point ) <= radius ){
-			//printf( "Ok." );
+
 			values = multiget( database, results_inter[i] );
-			//results_final.insert( results_final.end(), values.begin(), values.end() );
+
 			for( size_t j = 0 ; j < values.size() ; ++j ){
 				memset( buffer, 0, 256 );
 				sprintf( buffer, "%lu\n", values[j] );
 				out += std::string( buffer );
 				}
 			}
-		//printf( "\n" );
+
 		}
-	//printf( "\n" );
+
 	return out + "\r\n";
 	}
 
@@ -172,7 +176,7 @@ std::string handle_getr( double x0, double y0, double x1, double y1 ){
 		if( point.first >= x0 && point.first <= x1 ){
 			if( point.second >= y0 && point.second <= y1 ){
 	                        values = multiget( database, results_inter[i] );
-        	                //results_final.insert( results_final.end(), values.begin(), values.end() );
+
                 	        for( size_t j = 0 ; j < values.size() ; ++j ){
                         	        memset( buffer, 0, 256 );
                                 	sprintf( buffer, "%lu\n", values[j] );
@@ -200,21 +204,13 @@ std::string handle_geo_getr( double x0, double y0, double x1, double y1 ){
 	}
 
 std::string handle_del( uint64_t id ){
-	std::multimap< uint64_t, uint64_t >::iterator it;// = database.find( id );
-	//if( it != database.end() ){
-	//	database.erase( it );
-	//	}
-	//printf( "handle_del:id = %lu\n", id ); 
-	for( it = database.begin() ; it != database.end() ; it++ ){
-		//printf( "it->first = %lu, it->second = %lu \n", it->first, it->second );
-		if( it->second == id ){
-			hashes.erase( it->first );
-			database.erase( it );
-			//fprintf( append_log, "DEL %lu\r\n", id );
-			break;
-			}
+	std::unordered_map< uint64_t, std::vector< uint64_t > >::iterator it;
+	it = database.find( id );
+	if( it != database.end() ){
+		hashes.erase( it->first );
+		database.erase( it );
 		}
-
+	
 
 	return "Ok.\r\n";
 	}
@@ -229,11 +225,11 @@ std::string handle_message( std::string& message, int sock ){
 	std::string cmd = std::string( command );
 	std::string response;
 	
-//	std::cerr << "Received: '" << message << "', cmd == " << cmd << std::endl;
+
 	
 	if( cmd == "PUT" ){
 		sscanf( message.c_str(), "%s %f %f %lu", dummy, &x, &y, &id );
-		//std::cerr << "entering handle_put(" << x << ", " << y << ", " << id << " )" << std::endl;
+
 		response = handle_put( x, y, id );
 		if( sock > 0 ){ fprintf( append_log, "PUT %f %f %lu\r\n", x, y, id ); }
 

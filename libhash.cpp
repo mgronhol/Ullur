@@ -43,18 +43,13 @@ uint64_t compute_hash( double x, double y ){
 	}
 
 std::pair<uint64_t,uint64_t> mask_hash( uint64_t H, size_t N ){
-	uint64_t  mask = 0, mask2 = 0;
+	uint64_t  mask = 0;
 	for( size_t i = 0 ; i < 32  ; ++i ){
 		if( i < N ){
 			mask |= 0x03;
 			}
-/*		else{
-			mask2 |= 0x03;
-			}
-*/		
 		if( i < 31 ){
 			mask  <<= 0x02;
-			//mask2 <<= 0x02;
 			}
 		}
 	

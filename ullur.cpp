@@ -1,6 +1,7 @@
 #include <iostream>
 #include <map>
 #include <fstream>
+#include <unordered_map>
 
 #include <sys/types.h>
 #include <sys/ioctl.h>
@@ -224,46 +225,46 @@ std::string handle_message( std::string& message, int sock ){
 	char command[32], dummy[32];
 	float x, y, r, x0, y0, x1, y1;
 	uint64_t id;
-	sscanf( message.c_str(), "%s ", &command );
+	sscanf( message.c_str(), "%s ", command );
 	std::string cmd = std::string( command );
 	std::string response;
 	
 //	std::cerr << "Received: '" << message << "', cmd == " << cmd << std::endl;
 	
 	if( cmd == "PUT" ){
-		sscanf( message.c_str(), "%s %f %f %lu", &dummy, &x, &y, &id );
+		sscanf( message.c_str(), "%s %f %f %lu", dummy, &x, &y, &id );
 		//std::cerr << "entering handle_put(" << x << ", " << y << ", " << id << " )" << std::endl;
 		response = handle_put( x, y, id );
 		if( sock > 0 ){ fprintf( append_log, "PUT %f %f %lu\r\n", x, y, id ); }
 
 		}
 	if( cmd == "GEO-PUT" ){
-		sscanf( message.c_str(), "%s %f %f %lu", &dummy, &x, &y, &id );
+		sscanf( message.c_str(), "%s %f %f %lu", dummy, &x, &y, &id );
 		response = handle_geo_put( x, y, id );
 		}
 	
 	if( cmd == "GET" ){
-		sscanf( message.c_str(), "%s %f %f %f", &dummy, &x, &y, &r );
+		sscanf( message.c_str(), "%s %f %f %f", dummy, &x, &y, &r );
 		response = handle_get( x, y, r );
 		}
 
 	if( cmd == "GEO-GET" ){
-		sscanf( message.c_str(), "%s %f %f %f", &dummy, &x, &y, &r );
+		sscanf( message.c_str(), "%s %f %f %f", dummy, &x, &y, &r );
 		response = handle_geo_get( x, y, r);
 		}
 
 	if( cmd == "GETR" ){
-		sscanf( message.c_str(), "%s %f %f %f %f", &dummy, &x0, &y0, &x1, &y1 );
+		sscanf( message.c_str(), "%s %f %f %f %f", dummy, &x0, &y0, &x1, &y1 );
 		response = handle_getr( x0, y0, x1, y1 );
 		}
 
 	if( cmd == "GEO-GETR" ){
-		sscanf( message.c_str(), "%s %f %f %f %f", &dummy, &x0, &y0, &x1, &y1 );
+		sscanf( message.c_str(), "%s %f %f %f %f", dummy, &x0, &y0, &x1, &y1 );
 		response = handle_geo_getr( x0, y0, x1, y1 );
 		}
 
 	if( cmd == "DEL" ){
-		sscanf( message.c_str(), "%s %lu", &dummy, &id );
+		sscanf( message.c_str(), "%s %lu", dummy, &id );
 		response = handle_del( id );
 		if( sock > 0 ){ fprintf( append_log, "DEL %lu\r\n", id ); }
 		}
@@ -294,9 +295,11 @@ void load_append_log(){
 		while( handle.good() ){
 			std::getline( handle, line );
 			if( line.size() < 5 ){ continue; }
+			
 			line = line.substr( 0, line.find_first_of( '\r' ) );
-//			std::cout << "line: '" << line << "'" << std::endl;
+			
 			line += "\r\n";
+			
 			handle_message( line, -1 );
 			}
 		}
@@ -310,16 +313,13 @@ void load_append_log(){
 int main( int argc, char **argv ){
 	int serversock, clientsock;
 	
-	int yes = 1;
-	
-	//struct sockaddr_in address;
 	struct sockaddr_un address;
 	
 	int epfd = epoll_create( 1 );
 	
 	static struct epoll_event ev, events[32]; 
 	
-	int i, N, fd, addrlen, flags, n;
+	int i, N, addrlen, flags, n;
 	
 	char buffer[ 4096 ];
 	

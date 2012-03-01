@@ -41,18 +41,19 @@ Easiest way to start is to use the libUllur.py client library for python.
 
 Simple example:
 
-	#!/usr/bin/env python
-	import libUllur as Ullur
+```python
+#!/usr/bin/env python
+import libUllur as Ullur
 
-	client = Ullur.Ullur()
-	client.connect()
+client = Ullur.Ullur()
+client.connect()
 
-	client.put( 0.3, 0.3, 1234 )
+client.put( 0.3, 0.3, 1234 )
 
-	print client.get( 0.3, 0.3, 0.01 )
+print client.get( 0.3, 0.3, 0.01 )
 
-	client.disconnect()
-
+client.disconnect()
+```
 
 Installation
 ===========

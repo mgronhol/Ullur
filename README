@@ -17,7 +17,7 @@ Command set
 	GET x y r
 		Fetch all entries, whose distance is <= r from (x,y)
 	
-	GET-GET lat lon r
+	GEO-GET lat lon r
 		Fetch all entries, whose (angular) distance is <= r from (lat,lon)
 	
 	GETR x0 y0 x1 y1
@@ -29,7 +29,19 @@ Command set
 
 - Fetching complexity O(log N + M), where N is the number of keys in database 
 and M is the number entries in the search result
+
 - Insert is O(1)
 
 
 
+Installation
+===========
+
+Run "make" in the source directory.
+
+Persistence
+=========
+Ullur saves all inserts to "ullur.dump" file in chronological order.
+This file is flushed to disk every 10 seconds.
+
+When Ullur is started, this file is replayed into the server.

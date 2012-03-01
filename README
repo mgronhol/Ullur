@@ -28,7 +28,9 @@ Command set
 	
 
 - Fetching complexity O(log N + M), where N is the number of keys in database 
-and M is the number entries in the search result
+  and M is the number entries in the search result
+- O(log N + M) essentially means that only thing that matters is how many entries
+  there are in the result set, NOT how many entries are stored into the server.
 
 - Insert is O(1)
 

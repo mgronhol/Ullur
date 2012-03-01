@@ -52,9 +52,27 @@ class UllurClient( object ):
 		response = recv_line( self.sock )
 		return parse_response( response )
 
-	def delete( self, id ):
-		send_line( self.sock, "DEL %i\r\n"%id )
+
+	def geo_put( self, x, y, id ):
+		send_line( self.sock, "GEO-PUT %f %f %i\r\n"%( x,y, id ) )
 		recv_line( self.sock )
+
+	def geo_get( self, x, y, r ):
+		send_line( self.sock, "GEO-GET %f %f %f\r\n"%( x, y, r ) )
+		response = recv_line( self.sock )
+		return parse_response( response )
+	
+	def geo_getr( self, x0, y0, x1, y1 ):
+		send_line( self.sock, "GEO-GETR %f %f %f %f\r\n"%( x0, y0, x1, y1 ) )
+		response = recv_line( self.sock )
+		return parse_response( response )
+
+
+
+# Not implemented atm.
+#	def delete( self, id ):
+#		send_line( self.sock, "DEL %i\r\n"%id )
+#		recv_line( self.sock )
 
 
 
